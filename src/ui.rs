@@ -62,17 +62,24 @@ impl UI {
         // Top Menu Bar
         let menu_file = Rectangle::new(10.0, 5.0, 80.0, menu_bar_height as f32 - 10.0);
         let menu_edit = Rectangle::new(100.0, 5.0, 80.0, menu_bar_height as f32 - 10.0);
-        let menu_view = Rectangle::new(190.0, 5.0, 80.0, menu_bar_height as f32 - 10.0);
+        let menu_assets = Rectangle::new(190.0, 5.0, 80.0, menu_bar_height as f32 - 10.0);
+        let menu_gameobject = Rectangle::new(280.0, 5.0, 120.0, menu_bar_height as f32 - 10.0);
+        let menu_component = Rectangle::new(410.0, 5.0, 120.0, menu_bar_height as f32 - 10.0);
+        let menu_services = Rectangle::new(540.0, 5.0, 100.0, menu_bar_height as f32 - 10.0);
+        let menu_window = Rectangle::new(650.0, 5.0, 100.0, menu_bar_height as f32 - 10.0);
+        let menu_help = Rectangle::new(760.0, 5.0, 80.0, menu_bar_height as f32 - 10.0);
 
         // Draw Menu Bar
         d.draw_rectangle(0, 0, screen_width, menu_bar_height, Color::WHITE);
-        d.draw_rectangle_rec(menu_file, Color::LIGHTGRAY);
-        d.draw_rectangle_rec(menu_edit, Color::LIGHTGRAY);
-        d.draw_rectangle_rec(menu_view, Color::LIGHTGRAY);
 
         self.font_manager.draw_text(d, "File", Vector2::new(menu_file.x + 10.0, menu_file.y + 8.0), 16.0, 1.0, Color::BLACK);
         self.font_manager.draw_text(d, "Edit", Vector2::new(menu_edit.x + 10.0, menu_edit.y + 8.0), 16.0, 1.0, Color::BLACK);
-        self.font_manager.draw_text(d, "View", Vector2::new(menu_view.x + 10.0, menu_view.y + 8.0), 16.0, 1.0, Color::BLACK);
+        self.font_manager.draw_text(d, "Assets", Vector2::new(menu_assets.x + 10.0, menu_assets.y + 8.0), 16.0, 1.0, Color::BLACK);
+        self.font_manager.draw_text(d, "GameObject", Vector2::new(menu_gameobject.x + 10.0, menu_gameobject.y + 8.0), 16.0, 1.0, Color::BLACK);
+        self.font_manager.draw_text(d, "Component", Vector2::new(menu_component.x + 10.0, menu_component.y + 8.0), 16.0, 1.0, Color::BLACK);
+        self.font_manager.draw_text(d, "Services", Vector2::new(menu_services.x + 10.0, menu_services.y + 8.0), 16.0, 1.0, Color::BLACK);
+        self.font_manager.draw_text(d, "Window", Vector2::new(menu_window.x + 10.0, menu_window.y + 8.0), 16.0, 1.0, Color::BLACK);
+        self.font_manager.draw_text(d, "Help", Vector2::new(menu_help.x + 10.0, menu_help.y + 8.0), 16.0, 1.0, Color::BLACK);
 
         // Add right-click detection for right_panel_rect
         if d.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) && right_panel_rect.check_collision_point_rec(d.get_mouse_position()) {
@@ -258,7 +265,7 @@ impl UI {
                     "Extract From Prefab", "Update UXML Schema",
                      "Generate Lighting", "Open C# Project",
                     "View in Import Activity Window",
-                     "Properties"
+                    "Properties"
                 ];
 
                 let max_text_width = menu_items.iter().map(|item| self.font_manager.measure_text(item, 16.0, 1.0).x as i32).max().unwrap_or(0);
