@@ -10,6 +10,9 @@ pub struct UI {
     pub show_context_menu: bool,
     pub context_menu_position: Vector2,
     pub font_manager: FontManager,
+    pub show_right_context_menu: bool,
+    pub show_left_context_menu: bool,
+    pub show_assets_context_menu: bool,
 }
 
 impl UI {
@@ -20,6 +23,9 @@ impl UI {
             show_assets: true,
             show_packages: true,
             show_context_menu: false,
+            show_right_context_menu: false,
+            show_left_context_menu: false,
+            show_assets_context_menu: false,
             context_menu_position: Vector2::zero(),
             font_manager,
         }
@@ -68,6 +74,99 @@ impl UI {
         self.font_manager.draw_text(d, "Edit", Vector2::new(menu_edit.x + 10.0, menu_edit.y + 8.0), 16.0, 1.0, Color::BLACK);
         self.font_manager.draw_text(d, "View", Vector2::new(menu_view.x + 10.0, menu_view.y + 8.0), 16.0, 1.0, Color::BLACK);
 
+        // Add right-click detection for right_panel_rect
+        if d.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) && right_panel_rect.check_collision_point_rec(d.get_mouse_position()) {
+            self.show_right_context_menu = true;
+            self.show_left_context_menu = false;
+            self.show_assets_context_menu = false;
+            self.context_menu_position = d.get_mouse_position();
+        }
+
+        // Add right-click detection for left_panel_rect
+        if d.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) && left_panel_rect.check_collision_point_rec(d.get_mouse_position()) {
+            self.show_right_context_menu = false;
+            self.show_left_context_menu = true;
+            self.show_assets_context_menu = false;
+            self.context_menu_position = d.get_mouse_position();
+        }
+
+        // Add right-click detection for bottom_panel_rect (within Assets Content)
+        let assets_content_rect = Rectangle::new(10.0, bottom_panel_y as f32 + 30.0 + 10.0, bottom_panel_width as f32 - 20.0, bottom_panel_height as f32 - 30.0 - 20.0);
+        if d.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_RIGHT) && assets_content_rect.check_collision_point_rec(d.get_mouse_position()) {
+            self.show_right_context_menu = false;
+            self.show_left_context_menu = false;
+            self.show_assets_context_menu = true;
+            self.context_menu_position = d.get_mouse_position();
+        }
+
+        // Draw context menu for right panel
+        if self.show_right_context_menu {
+            let right_menu_items = [
+                "Right Option 1", "Right Option 2", "Right Option 3", "Right Option 4"
+            ];
+
+            let max_text_width = right_menu_items.iter().map(|item| self.font_manager.measure_text(item, 16.0, 1.0).x as i32).max().unwrap_or(0);
+            let context_menu_width = (max_text_width as f32 * 1.1).ceil();
+            let context_menu_height = (right_menu_items.len() as f32 * 20.0 * 1.1).ceil();
+
+            // Adjust context menu position to stay within right panel bounds
+            let mut context_menu_x = self.context_menu_position.x;
+            let mut context_menu_y = self.context_menu_position.y;
+            if context_menu_x + context_menu_width > right_panel_rect.x + right_panel_rect.width {
+                context_menu_x = right_panel_rect.x + right_panel_rect.width - context_menu_width;
+            }
+            if context_menu_y + context_menu_height > right_panel_rect.y + right_panel_rect.height {
+                context_menu_y = right_panel_rect.y + right_panel_rect.height - context_menu_height;
+            }
+
+            let context_menu_rect = Rectangle::new(context_menu_x, context_menu_y, context_menu_width, context_menu_height);
+            d.draw_rectangle_rec(context_menu_rect, Color::LIGHTGRAY);
+
+            for (i, item) in right_menu_items.iter().enumerate() {
+                let item_rect = Rectangle::new(context_menu_rect.x, context_menu_rect.y + i as f32 * 20.0, context_menu_rect.width, 20.0);
+                d.draw_rectangle_lines_ex(item_rect, 1.0, Color::BLACK);
+                self.font_manager.draw_text(d, item, Vector2::new(item_rect.x + 10.0, item_rect.y + 2.0), 16.0, 1.0, Color::BLACK);
+            }
+
+            // Hide context menu if left-click is detected outside the menu
+            if d.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) && !context_menu_rect.check_collision_point_rec(d.get_mouse_position()) {
+                self.show_right_context_menu = false;
+            }
+        }
+        // Draw context menu for left panel
+        if self.show_left_context_menu {
+            let left_menu_items = [
+                "Left Option 1", "Left Option 2", "Left Option 3", "Left Option 4"
+            ];
+
+            let max_text_width = left_menu_items.iter().map(|item| self.font_manager.measure_text(item, 16.0, 1.0).x as i32).max().unwrap_or(0);
+            let context_menu_width = (max_text_width as f32 * 1.1).ceil();
+            let context_menu_height = (left_menu_items.len() as f32 * 20.0 * 1.1).ceil();
+
+            // Adjust context menu position to stay within left panel bounds
+            let mut context_menu_x = self.context_menu_position.x;
+            let mut context_menu_y = self.context_menu_position.y;
+            if context_menu_x + context_menu_width > left_panel_rect.x + left_panel_rect.width {
+                context_menu_x = left_panel_rect.x + left_panel_rect.width - context_menu_width;
+            }
+            if context_menu_y + context_menu_height > left_panel_rect.y + left_panel_rect.height {
+                context_menu_y = left_panel_rect.y + left_panel_rect.height - context_menu_height;
+            }
+
+            let context_menu_rect = Rectangle::new(context_menu_x, context_menu_y, context_menu_width, context_menu_height);
+            d.draw_rectangle_rec(context_menu_rect, Color::LIGHTGRAY);
+
+            for (i, item) in left_menu_items.iter().enumerate() {
+                let item_rect = Rectangle::new(context_menu_rect.x, context_menu_rect.y + i as f32 * 20.0, context_menu_rect.width, 20.0);
+                d.draw_rectangle_lines_ex(item_rect, 1.0, Color::BLACK);
+                self.font_manager.draw_text(d, item, Vector2::new(item_rect.x + 10.0, item_rect.y + 2.0), 16.0, 1.0, Color::BLACK);
+            }
+
+            // Hide context menu if left-click is detected outside the menu
+            if d.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) && !context_menu_rect.check_collision_point_rec(d.get_mouse_position()) {
+                self.show_left_context_menu = false;
+            }
+        }                        
         // Tab Bar
         let tab_bar_height = 30;
         let tab_console = Rectangle::new(10.0, bottom_panel_y as f32 + 5.0, 80.0, tab_bar_height as f32);
