@@ -2,12 +2,16 @@
 name = "rust_game_engine"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 [dependencies]
-# Add dependencies as needed
 egui = "0.20"        # For creating UI components
 wgpu = "0.16"        # For rendering pipeline (if applicable)
 eframe = "0.20"
+image = "0.25.6"
+
+[build-dependencies]
+embed-resource = "3.0"
 
 [[bin]]
 name = "rust_game_engine"
